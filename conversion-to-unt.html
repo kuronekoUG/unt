@@ -61,26 +61,20 @@
                 { search: 'つ', replace: 'ちゅ' },
                 { search: 'おくすり', replace: 'おくちゅり' },
                 { search: 'た', replace: 'ちゃ' }
-            ];
 
-            // 変換済みテキストを一時的に保持
-            var convertedText = inputText;
+
+                
+                
+            ];
 
             // 変換処理
             rules.forEach(function(rule) {
                 var regex = new RegExp(rule.search, 'g');
-                
-                // 一時的なタグで囲って、再変換を防止
-                convertedText = convertedText.replace(regex, function(match) {
-                    return `<converted>${match}</converted>`;
-                });
+                inputText = inputText.replace(regex, rule.replace);
             });
 
-            // プレースホルダタグを削除して最終的な変換結果を表示
-            convertedText = convertedText.replace(/<converted>/g, '').replace(/<\/converted>/g, '');
-
             // 結果を表示
-            document.getElementById("output").textContent = convertedText;
+            document.getElementById("output").textContent = inputText;
         }
     </script>
 
