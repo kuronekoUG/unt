@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>うんた語に変換すりゅよ(ver 1.0)</title>
+    <title>うんた語に変換すりゅよ(ver 1.1)</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -26,7 +26,7 @@
 </head>
 <body>
 
-    <h1>うんた語に変換すりゅよ(test 1.01)</h1>
+    <h1>うんた語に変換すりゅよ(test 1.02)</h1>
     <textarea id="inputText" placeholder="変換したい文字を入力ちてね"></textarea><br><br>
     <button onclick="convertText()">うんた語に変換</button>
 
@@ -34,13 +34,18 @@
 
     <script>
         function convertText() {
-            var inputText = document.getElementById("inputText").value;
+            let inputText = document.getElementById("inputText").value;
 
-            // 🔸 変換ルールを追加
-            var rules = [
+            // 🔸 変換防止リスト
+            const blockList = [
+                'うんた', // すでに「うんた」は変換しない
+                'おくすり' // 「おくすり」は変換禁止
+            ];
+
+            // 🔹 変換ルール
+            const rules = [
                 { search: 'なつき', replace: 'なちゅき' },
                 { search: 'なくなった', replace: 'ないなった' },
-                { search: 'おくすり', replace: 'おくちゅり' },
                 { search: 'ありが', replace: 'あいが' },
                 { search: 'すごい', replace: 'しゅごい' },
                 { search: 'こっそり', replace: 'こっしょり' },
@@ -59,36 +64,43 @@
                 { search: 'つ', replace: 'ちゅ' }
             ];
 
-            // 🔸 変換しない文字列（例外リスト）
-            var excludeList = [
-                'うんた',
-                'ないなった',
-                'しちゃァ',
-                'できちゃァ',
-                'しゅごい',
+            // 🔹 変換済み文字列の保護用プレースホルダ
+            let placeholders = {};
+            let placeholderIndex = 0;
 
-            ];
-
-            // 🔸 例外部分を保護する（プレースホルダで置き換え）
-            var placeholders = {};
-            excludeList.forEach(function(exclude, index) {
-                var placeholder = `__EXCLUDE_${index}__`;
-                placeholders[placeholder] = exclude;
-                inputText = inputText.replace(new RegExp(exclude, 'g'), placeholder);
+            // 🔸 1. 変換禁止ワードを一時的にプレースホルダに変換
+            blockList.forEach((word) => {
+                const regex = new RegExp(word, 'g');
+                inputText = inputText.replace(regex, (match) => {
+                    let placeholder = `__BLOCKED_${placeholderIndex}__`;
+                    placeholders[placeholder] = match; // 元の文字列を保存
+                    placeholderIndex++;
+                    return placeholder;
+                });
             });
 
-            // 🔸 変換処理（プレースホルダ部分は無視）
-            rules.forEach(function(rule) {
-                var regex = new RegExp(rule.search, 'g');
-                inputText = inputText.replace(regex, rule.replace);
+            // 🔸 2. 変換ルール適用（プレースホルダをスキップ）
+            rules.forEach((rule) => {
+                const regex = new RegExp(rule.search, 'g');
+                inputText = inputText.replace(regex, (match) => {
+                    // すでに変換済み or プレースホルダの場合はスキップ
+                    if (Object.values(placeholders).includes(match)) {
+                        return match;
+                    }
+                    let placeholder = `__CONVERTED_${placeholderIndex}__`;
+                    placeholders[placeholder] = rule.replace;
+                    placeholderIndex++;
+                    return placeholder;
+                });
             });
 
-            // 🔸 プレースホルダを元の文字列に戻す
-            Object.keys(placeholders).forEach(function(placeholder) {
-                inputText = inputText.replace(new RegExp(placeholder, 'g'), placeholders[placeholder]);
+            // 🔸 3. プレースホルダを元の値に戻す
+            Object.keys(placeholders).forEach((placeholder) => {
+                const regex = new RegExp(placeholder, 'g');
+                inputText = inputText.replace(regex, placeholders[placeholder]);
             });
 
-            // 🔸 結果を表示
+            // 🔹 変換結果を表示
             document.getElementById("output").textContent = inputText;
         }
     </script>
