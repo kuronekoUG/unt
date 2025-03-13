@@ -38,14 +38,12 @@
 
             // 🔸 変換ルールを追加
             var rules = [
-                { search: 'うんた', replace: 'うんた' },
                 { search: 'なつき', replace: 'なちゅき' },
                 { search: 'なくなった', replace: 'ないなった' },
                 { search: 'おくすり', replace: 'おくちゅり' },
                 { search: 'ありが', replace: 'あいが' },
                 { search: 'すごい', replace: 'しゅごい' },
                 { search: 'こっそり', replace: 'こっしょり' },
-                { search: 'しんぱい', replace: 'しんぱい' },
                 { search: '心配した', replace: '心配しちゃァ' },
                 { search: 'できた', replace: 'できちゃァ' },
                 { search: 'した', replace: 'しちゃァ' },
@@ -61,28 +59,30 @@
                 { search: 'つ', replace: 'ちゅ' }
             ];
 
-            // 🔸 変換しない文字列をリスト化（例外リスト）
+            // 🔸 変換しない文字列（例外リスト）
             var excludeList = [
-                'おくすり', // 例: これを変換しない
-                '心配した'
+                'うんた',
+                
             ];
 
-            // 🔸 例外を一時的にマークしておく
-            excludeList.forEach(function(exclude) {
-                var regex = new RegExp(exclude, 'g');
-                inputText = inputText.replace(regex, function(match) {
-                    return `<exclude>${match}</exclude>`;
-                });
+            // 🔸 例外部分を保護する（プレースホルダで置き換え）
+            var placeholders = {};
+            excludeList.forEach(function(exclude, index) {
+                var placeholder = `__EXCLUDE_${index}__`;
+                placeholders[placeholder] = exclude;
+                inputText = inputText.replace(new RegExp(exclude, 'g'), placeholder);
             });
 
-            // 🔸 変換処理（例外部分は無視される）
+            // 🔸 変換処理（プレースホルダ部分は無視）
             rules.forEach(function(rule) {
                 var regex = new RegExp(rule.search, 'g');
                 inputText = inputText.replace(regex, rule.replace);
             });
 
-            // 🔸 例外部分のタグを外して戻す
-            inputText = inputText.replace(/<exclude>/g, '').replace(/<\/exclude>/g, '');
+            // 🔸 プレースホルダを元の文字列に戻す
+            Object.keys(placeholders).forEach(function(placeholder) {
+                inputText = inputText.replace(new RegExp(placeholder, 'g'), placeholders[placeholder]);
+            });
 
             // 🔸 結果を表示
             document.getElementById("output").textContent = inputText;
