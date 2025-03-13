@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>うんた語に変換すりゅよ(ver 1.0)</title>
+    <title>うんた語に変換すりゅよ(ver 1.1)</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,11 +22,27 @@
             width: 100%;
             height: 100px;
         }
+        footer {
+            margin-top: 30px;
+            padding-top: 10px;
+            border-top: 1px solid #ccc;
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+        }
+        footer a {
+            color: #1da1f2;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
 
-    <h1>うんた語に変換すりゅよ(ver 1.0)</h1>
+    <h1>うんた語に変換すりゅよ(ver 1.1)</h1>
     <textarea id="inputText" placeholder="変換したい文字を入力ちてね"></textarea><br><br>
     <button onclick="convertText()">うんた語に変換</button>
 
@@ -34,18 +50,21 @@
 
     <script>
         function convertText() {
-            var inputText = document.getElementById("inputText").value;
+            let inputText = document.getElementById("inputText").value;
 
-            // 変換ルールを追加
-            var rules = [
-                { search: 'うんた', replace: 'うんた' },
+            // 🔸 変換防止リスト
+            const blockList = [
+                'うんた', // すでに「うんた」は変換しない
+                'おくすり' // 「おくすり」は変換禁止
+            ];
+
+            // 🔹 変換ルール
+            const rules = [
                 { search: 'なつき', replace: 'なちゅき' },
                 { search: 'なくなった', replace: 'ないなった' },
-                { search: 'おくすり', replace: 'おくちゅり' },
                 { search: 'ありが', replace: 'あいが' },
                 { search: 'すごい', replace: 'しゅごい' },
                 { search: 'こっそり', replace: 'こっしょり' },
-                { search: 'しんぱい', replace: 'しんぱい' },
                 { search: '心配した', replace: '心配しちゃァ' },
                 { search: 'できた', replace: 'できちゃァ' },
                 { search: 'した', replace: 'しちゃァ' },
@@ -58,25 +77,59 @@
                 { search: 'れ', replace: 'りぇ' },
                 { search: 'ろ', replace: 'りょ' },
                 { search: 'せ', replace: 'しぇ' },
-                { search: 'つ', replace: 'ちゅ' },
-                { search: 'おくすり', replace: 'おくちゅり' },
-                { search: 'た', replace: 'ちゃ' }
-
-
-                
-                
+                { search: 'つ', replace: 'ちゅ' }
             ];
 
-            // 変換処理
-            rules.forEach(function(rule) {
-                var regex = new RegExp(rule.search, 'g');
-                inputText = inputText.replace(regex, rule.replace);
+            // 🔹 変換済み文字列の保護用プレースホルダ
+            let placeholders = {};
+            let placeholderIndex = 0;
+
+            // 🔸 1. 変換禁止ワードを一時的にプレースホルダに変換
+            blockList.forEach((word) => {
+                const regex = new RegExp(word, 'g');
+                inputText = inputText.replace(regex, (match) => {
+                    let placeholder = `__BLOCKED_${placeholderIndex}__`;
+                    placeholders[placeholder] = match; // 元の文字列を保存
+                    placeholderIndex++;
+                    return placeholder;
+                });
             });
 
-            // 結果を表示
+            // 🔸 2. 変換ルール適用（プレースホルダをスキップ）
+            rules.forEach((rule) => {
+                const regex = new RegExp(rule.search, 'g');
+                inputText = inputText.replace(regex, (match) => {
+                    if (Object.values(placeholders).includes(match)) {
+                        return match;
+                    }
+                    let placeholder = `__CONVERTED_${placeholderIndex}__`;
+                    placeholders[placeholder] = rule.replace;
+                    placeholderIndex++;
+                    return placeholder;
+                });
+            });
+
+            // 🔸 3. プレースホルダを元の値に戻す
+            Object.keys(placeholders).forEach((placeholder) => {
+                const regex = new RegExp(placeholder, 'g');
+                inputText = inputText.replace(regex, placeholders[placeholder]);
+            });
+
+            // 🔹 変換結果を表示
             document.getElementById("output").textContent = inputText;
         }
     </script>
+
+    <footer>
+        <p>更新履歴：</p>
+        <ul>
+            <li>ver 1.1 - 2025年3月13日:変換機能を改善しちゃァよ。Xへのリンク・更新履歴を追加しちゃァよ</li>
+            <li>ver 1.0 - 2025年3月12日: ページをつくっちゃァよ</li>
+        </ul>
+        <p>
+            👉 <a href="https://x.com/kuroneko_UG" target="_blank" rel="noopener noreferrer">ご意見・ご要望はこちらまで</a>
+        </p>
+    </footer>
 
 </body>
 </html>
