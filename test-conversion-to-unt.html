@@ -42,7 +42,7 @@
 </head>
 <body>
 
-    <h2>うんた語に変換すりゅよ<br>(ver 1.1)</h2>
+    <h2>うんた語に変換すりゅよ<br>(test ver 1.1)</h2>
     <textarea id="inputText" placeholder="変換したい文字を入力ちてね"></textarea><br><br>
     <button onclick="convertText()">うんた語に変換</button>
 
@@ -50,81 +50,81 @@
 
     <script>
         function convertText() {
-            let inputText = document.getElementById("inputText").value;
+    let inputText = document.getElementById("inputText").value;
 
-            // 🔸 変換防止リスト
-            const blockList = [
-                'うんたた',
-                'うんた',
-                'ましまし',
-                'しかし',
-                'たくさん'
-            ];
+    // 🔸 変換防止リスト
+    const blockList = [
+        'うんたた',
+        'うんた',
+        'ましまし',
+        'しかし',
+        'たくさん'
+    ];
 
-            // 🔹 変換ルール
-            const rules = [
-                { search: 'なつき', replace: 'なちゅき' },
-                { search: 'なくなった', replace: 'ないなった' },
-                { search: 'そういうの', replace: 'そゆの' },
-                { search: 'ありが', replace: 'あいが' },
-                { search: 'すごい', replace: 'しゅごい' },
-                { search: 'こっそり', replace: 'こっしょり' },
-                { search: '心配した', replace: '心配しちゃァ' },
-                { search: 'できた', replace: 'できちゃァ' },
-                { search: 'すご', replace: 'しゅご' },
-                { search: 'したい', replace: 'ちたい' },
-                { search: 'したよ', replace: 'ちたよ' },
-                { search: 'した', replace: 'ちた' },
-                { search: 'ぁ', replace: 'ァ' },
-                { search: 'ぇ', replace: 'ェ' },
-                { search: 'し', replace: 'ち' },
-                { search: 'た', replace: 'ちゃ' },
-                { search: 'ら', replace: 'りゃ' },
-                { search: 'る', replace: 'りゅ' },
-                { search: 'れ', replace: 'りぇ' },
-                { search: 'ろ', replace: 'りょ' },
-                { search: 'せ', replace: 'しぇ' },
-                { search: 'つ', replace: 'ちゅ' }
-            ];
+    // 🔹 変換ルール
+    const rules = [
+        { search: 'なつき', replace: 'なちゅき' },
+        { search: 'なくなった', replace: 'ないなった' },
+        { search: 'そういうの', replace: 'そゆの' },
+        { search: 'ありが', replace: 'あいが' },
+        { search: 'すごい', replace: 'しゅごい' },
+        { search: 'こっそり', replace: 'こっしょり' },
+        { search: '心配した', replace: '心配しちゃァ' },
+        { search: 'できた', replace: 'できちゃァ' },
+        { search: 'すご', replace: 'しゅご' },
+        { search: 'したい', replace: 'ちたい' },
+        { search: 'したよ', replace: 'ちたよ' },
+        { search: 'した', replace: 'ちた' },
+        { search: 'ぁ', replace: 'ァ' },
+        { search: 'ぇ', replace: 'ェ' },
+        { search: 'し', replace: 'ち' },
+        { search: 'た', replace: 'ちゃ' },
+        { search: 'ら', replace: 'りゃ' },
+        { search: 'る', replace: 'りゅ' },
+        { search: 'れ', replace: 'りぇ' },
+        { search: 'ろ', replace: 'りょ' },
+        { search: 'せ', replace: 'しぇ' },
+        { search: 'つ', replace: 'ちゅ' }
+    ];
 
-            // 🔹 変換済み文字列の保護用プレースホルダ
-            let placeholders = {};
-            let placeholderIndex = 0;
+    // 🔹 変換済み文字列の保護用プレースホルダ
+    let placeholders = {};
+    let placeholderIndex = 0;
 
-            // 🔸 1. 変換禁止ワードを一時的にプレースホルダに変換
-            blockList.forEach((word) => {
-                const regex = new RegExp(word, 'g');
-                inputText = inputText.replace(regex, (match) => {
-                    let placeholder = `__BLOCKED_${placeholderIndex}__`;
-                    placeholders[placeholder] = match; // 元の文字列を保存
-                    placeholderIndex++;
-                    return placeholder;
-                });
-            });
+    // 🔸 1. 変換禁止ワードを一時的にプレースホルダに変換
+    blockList.forEach((word) => {
+        const regex = new RegExp(word, 'g');
+        inputText = inputText.replace(regex, (match) => {
+            let placeholder = `__BLOCKED_${placeholderIndex}__`;
+            placeholders[placeholder] = match;
+            placeholderIndex++;
+            return placeholder;
+        });
+    });
 
-            // 🔸 2. 変換ルール適用（プレースホルダをスキップ）
-            rules.forEach((rule) => {
-                const regex = new RegExp(rule.search, 'g');
-                inputText = inputText.replace(regex, (match) => {
-                    if (Object.values(placeholders).includes(match)) {
-                        return match;
-                    }
-                    let placeholder = `__CONVERTED_${placeholderIndex}__`;
-                    placeholders[placeholder] = rule.replace;
-                    placeholderIndex++;
-                    return placeholder;
-                });
-            });
+    // 🔸 2. 変換ルール適用（プレースホルダをスキップ）
+    rules.forEach((rule) => {
+        const regex = new RegExp(rule.search, 'g');
+        inputText = inputText.replace(regex, (match) => {
+            if (Object.values(placeholders).includes(match)) {
+                return match;
+            }
+            let placeholder = `__CONVERTED_${placeholderIndex}__`;
+            placeholders[placeholder] = rule.replace;
+            placeholderIndex++;
+            return placeholder;
+        });
+    });
 
-            // 🔸 3. プレースホルダを元の値に戻す
-            Object.keys(placeholders).forEach((placeholder) => {
-                const regex = new RegExp(placeholder, 'g');
-                inputText = inputText.replace(regex, placeholders[placeholder]);
-            });
+    // 🔸 3. プレースホルダを元の値に戻す
+    Object.keys(placeholders).forEach((placeholder) => {
+        const regex = new RegExp(placeholder, 'g');
+        inputText = inputText.replace(regex, placeholders[placeholder]);
+    });
 
-            // 🔹 変換結果を表示
-            document.getElementById("output").textContent = inputText;
-        }
+    // 🔹 変換結果を表示（改行を保持）
+    document.getElementById("output").innerHTML = inputText.replace(/\n/g, '<br>');
+}
     </script>
 
     <footer>
