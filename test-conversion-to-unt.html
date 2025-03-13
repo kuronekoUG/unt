@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>うんた語に変換すりゅよ(ver 1.1)</title>
+    <title>うんた語に変換すりゅよ(ver 1.2)</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -42,12 +42,15 @@
 </head>
 <body>
 
-    <h2>うんた語に変換すりゅよ<br>(test ver 1.1)</h2>
+    <h2>うんた語に変換すりゅよ<br>[test ver 1.2]</h2>
     <textarea id="inputText" placeholder="変換したい文字を入力ちてね"></textarea><br><br>
     <button onclick="convertText()">うんた語に変換</button>
 
     <div id="output"></div>
-
+    
+<!-- コピー用のボタン追加 -->
+<button onclick="copyText()">変換結果をコピー</button>
+    
     <script>
         function convertText() {
     let inputText = document.getElementById("inputText").value;
@@ -125,11 +128,29 @@
     // 🔹 変換結果を表示（改行を保持）
     document.getElementById("output").innerHTML = inputText.replace(/\n/g, '<br>');
 }
+
+    
+    </script>
+    
+    <script>
+    function copyText() {
+        const output = document.getElementById("output");
+        const text = output.innerText;
+
+        // クリップボードにコピー
+        navigator.clipboard.writeText(text).then(() => {
+            alert("コピーしました！");
+        }).catch(err => {
+            console.error('コピーに失敗しました: ', err);
+        });
+    }
     </script>
 
     <footer>
         <p>【更新履歴】</p>
         <ul>
+            <li><b>ver 1.2 - 2025年3月13日</b>
+            <br>改行を保持するようにしちゃァよ。</li>
             <li><b>ver 1.1 - 2025年3月13日</b>
             <br>変換機能を改善しちゃァよ。Xへのリンク・更新履歴を追加しちゃァよ</li>
             <li><b>ver 1.0 - 2025年3月12日</b>
