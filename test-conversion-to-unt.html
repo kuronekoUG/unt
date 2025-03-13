@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>うんた語に変換すりゅよ(test)</title>
+    <title>うんた語に変換すりゅよ(ver 1.0)</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -26,7 +26,7 @@
 </head>
 <body>
 
-    <h1>うんた語に変換すりゅよ(test)</h1>
+    <h1>うんた語に変換すりゅよ(ver 1.0)</h1>
     <textarea id="inputText" placeholder="変換したい文字を入力ちてね"></textarea><br><br>
     <button onclick="convertText()">うんた語に変換</button>
 
@@ -36,7 +36,7 @@
         function convertText() {
             var inputText = document.getElementById("inputText").value;
 
-            // 変換ルールを追加
+            // 🔸 変換ルールを追加
             var rules = [
                 { search: 'うんた', replace: 'うんた' },
                 { search: 'なつき', replace: 'なちゅき' },
@@ -58,29 +58,34 @@
                 { search: 'れ', replace: 'りぇ' },
                 { search: 'ろ', replace: 'りょ' },
                 { search: 'せ', replace: 'しぇ' },
-                { search: 'つ', replace: 'ちゅ' },
-                { search: 'おくすり', replace: 'おくちゅり' },
-                { search: 'た', replace: 'ちゃ' }
+                { search: 'つ', replace: 'ちゅ' }
             ];
 
-            // 変換済みテキストを一時的に保持
-            var convertedText = inputText;
+            // 🔸 変換しない文字列をリスト化（例外リスト）
+            var excludeList = [
+                'おくすり', // 例: これを変換しない
+                '心配した'
+            ];
 
-            // 変換処理
-            rules.forEach(function(rule) {
-                var regex = new RegExp(rule.search, 'g');
-                
-                // 一時的なタグで囲って、再変換を防止
-                convertedText = convertedText.replace(regex, function(match) {
-                    return `<converted>${match}</converted>`;
+            // 🔸 例外を一時的にマークしておく
+            excludeList.forEach(function(exclude) {
+                var regex = new RegExp(exclude, 'g');
+                inputText = inputText.replace(regex, function(match) {
+                    return `<exclude>${match}</exclude>`;
                 });
             });
 
-            // プレースホルダタグを削除して最終的な変換結果を表示
-            convertedText = convertedText.replace(/<converted>/g, '').replace(/<\/converted>/g, '');
+            // 🔸 変換処理（例外部分は無視される）
+            rules.forEach(function(rule) {
+                var regex = new RegExp(rule.search, 'g');
+                inputText = inputText.replace(regex, rule.replace);
+            });
 
-            // 結果を表示
-            document.getElementById("output").textContent = convertedText;
+            // 🔸 例外部分のタグを外して戻す
+            inputText = inputText.replace(/<exclude>/g, '').replace(/<\/exclude>/g, '');
+
+            // 🔸 結果を表示
+            document.getElementById("output").textContent = inputText;
         }
     </script>
 
